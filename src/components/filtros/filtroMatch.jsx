@@ -8,7 +8,7 @@ import { config } from '../../config/config'
 import { apis } from '../../api/apis'
 import swal from 'sweetalert'
 
-const FiltrosMatch = ({plantas,setFiltros,filtros, accederLogin}) => {
+const FiltrosMatch = ({plantas, setFiltros, setCompras, setVentas, filtros, accederLogin}) => {
   const [proveedores, setProveedores] = React.useState([])
   const {user, token} = config.obtenerLocalStorage()
 
@@ -54,7 +54,13 @@ const FiltrosMatch = ({plantas,setFiltros,filtros, accederLogin}) => {
           value={filtros.filtros.planta} 
           name='planta' 
           onChange={(e) => {
-          setFiltros(prev => ({
+          setCompras(prev => ({
+          ...prev,
+          filtros: {
+            ...prev.filtros,
+           planta: e.target.value
+          }}))
+          setVentas(prev => ({
           ...prev,
           filtros: {
             ...prev.filtros,
