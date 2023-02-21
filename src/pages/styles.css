@@ -1,0 +1,60 @@
+/*CSS INICIO*/
+
+.fondoLogo{
+    width: 50%;
+    min-width: 10rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/*CSS LOGIN*/
+.fondo{
+    background: #2193b0;
+    background: -webkit-linear-gradient(to bottom, #6dd5ed, #2193b0);
+    background: linear-gradient(to bottom, #6dd5ed, #2193b0);
+    height:100vh;
+    width:100%;
+}
+
+.login_form{
+    position: absolute;
+    top:40%;
+    left: 50%;
+    width: 90%;
+    max-width: 350px;
+    transform: translate(-50%,-50%);
+}
+
+.login_logo{
+    text-align: center;
+}
+
+/*CSS REPORTE*/
+.reporte_navbar{
+    background: #2193b0;
+    background: -webkit-linear-gradient(to right, #6dd5ed, #2193b0);
+    background: linear-gradient(to right, #6dd5ed, #2193b0);
+}
+
+/*CSS MENU DESPLEGABLE*/
+
+.listaDesplegable > a{
+    color: white !important;
+}
+
+.dropdown-item:active, .dropdown-item.active{
+    background-color: #e9ecef !important;
+}
+
+/*CONFIGURACION TEXT AREA READ ONLY*/
+.textAreaSinReadOnly:read-only{
+    background-color: white;
+}
+
+
+/* CONFIGURACION TABLA PARA QUE NO SE MUESTREN RENDIJAS */
+.rendisajes > tr > td{
+    border-style: hidden !important;
+}
