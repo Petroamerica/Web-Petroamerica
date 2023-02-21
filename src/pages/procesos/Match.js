@@ -2,14 +2,14 @@ import moment from "moment"
 import React from "react"
 import { Button, Col, Form, Spinner } from "react-bootstrap"
 import swal from "sweetalert"
+import FiltrosMatch from '../../components/filtros/filtroMatch'
+import TablaControl from "../../components/table/table"
+import Header from "../../components/header/header"
+import filter from '../../img/filter.svg'
 import { config } from "../../config/config"
 import { usePlantas } from "../../hooks/usePlantas"
 import { useProveedores } from "../../hooks/useProveedores"
-import Header from "../../components/header/header"
-import FiltrosMatch from '../../components/filtros/filtroMatch'
-import TablaControl from "../../components/table/table"
 import { ModalMatch } from '../../components/modal/modalMatch'
-import filter from '../../img/filter.svg'
 import { apis } from '../../api/apis.js'
 import { ParseFactCompra, ParseFactVenta } from '../../utils/parseFact'
 
@@ -64,6 +64,12 @@ const Match = ({accederLogin}) => {
       setSelectedCompra(prev => [...prev, value])
     } else {
       setSelectedCompra(prev => prev.filter(e => e.fact !== value.fact))
+      setSelectedCompra(lastCompra => {
+        if(lastCompra.length === 0) {
+          setSelectedVenta([])
+        }
+        return lastCompra
+      })
     }
     console.log(selectedCompra)
   }
@@ -246,6 +252,8 @@ const Match = ({accederLogin}) => {
                 accederLogin={accederLogin}
                 plantas={plantas}
                 setFiltros = {setVentas}
+                setVentas = {setVentas}
+                setCompras = {setCompras}
                 filtros = {ventas}
                 />
           }
@@ -289,7 +297,7 @@ const Match = ({accederLogin}) => {
                         <input type='checkbox'
                           name={value.fact}
                           disabled={
-                            selectedCompra.length === 0 ? false 
+                            selectedCompra.length === 0 ? true 
                             : value.cantidad > selectedCompra[0].cantidad ? true
                             : (selectedVenta.length === 0) ? false 
                             : (selectedVenta.reduce((acc, obj) => acc + obj.cantidad, 0) <=
@@ -357,6 +365,8 @@ const Match = ({accederLogin}) => {
           mode && <FiltrosMatch 
                 accederLogin={accederLogin}
                 setFiltros = {setCompras}
+                setCompras = {setCompras}
+                setVentas = {setVentas}
                 plantas={plantas}
                 filtros = {compras}
               />
