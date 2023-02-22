@@ -7,6 +7,7 @@ import FiltroMatch from '../filtros/filtroMatch'
 import { apis } from '../../api/apis'
 import { config } from '../../config/config'
 import {usePlantas} from '../../hooks/usePlantas'
+import swal from 'sweetalert';
 
 export const ModalMatch = ({accederLogin}) => {
   const [show, setShow] = useState(false);
@@ -22,16 +23,26 @@ export const ModalMatch = ({accederLogin}) => {
 
   React.useEffect(() => {
     const {user, token} = config.obtenerLocalStorage()
-    //getMatch: async (idProveedor, idPlanta, fechaInicial, fechaFinal,token) => {
+    
     async function fetchData() {
-      const data = await apis.getMatch('-', '-', '2023-02-10', '2023-02-10', token) 
-      setMatch(prev => ({
-        ...prev,
-        data: data
-      }))
+      try {
+        const data = await apis.getMatch('-', '-', '2023-02-10', '2023-02-10', token) 
+        setMatch(prev => ({
+          ...prev,
+          data: data
+        }))
+      } catch (error) {
+        if(error.status === 401) {
+          swal("Mensaje", "Tiempo de sesión culminado.", "error")
+          config.cerrarSesion()
+          this.props.accederLogin(false)
+          return
+        }
+        swal("Mensaje", "Ocurrió un error en la solicitud para la lista de Matchs.", "error")
+      }
     }
     fetchData()
-  }, []) 
+  }, [show]) 
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -47,34 +58,26 @@ export const ModalMatch = ({accederLogin}) => {
           <Modal.Title>Articulos Enlazados</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-
           <div style={{display: 'flex', gap:'30px', justifyContent: 'center'}}>
             <TablaControl
-              cols={["Planta","Proveedor", "Fact"]}
+              cols={["Planta","Proveedor", "Fact", "Planta - Compra", "Proveedor - Compra", "Fact - Compra", "Match", ""]}
               mode={false}
             > 
               {match.data.map((value, index) => {
               const fact = value.id_tipo_doc.substring(1,0) + value.serie.substring(1) + "-" + value.nro_documento
+              const factCompra = value.id_tipo_doc_pur.substring(1,0) + value.serie_pur.substring(1) + "-" + value.nro_documento_pur
               return(
                 <tr key={index}>
                   <td>{value.planta}</td>
                   <td>{value.proveedor}</td>
                   <td>{fact}</td>
-                </tr>
-              )})
-              }
-            </TablaControl>
-            <TablaControl
-              cols={["Planta","Proveedor", "Fact"]}
-              mode={false}
-            > 
-              {match.data.map((value, index) => {
-              const fact = value.id_tipo_doc_pur.substring(1,0) + value.serie_pur.substring(1) + "-" + value.nro_documento_pur
-              return(
-                <tr key={index}>
                   <td>{value.planta_pur}</td>
                   <td>{value.proveedor_pur}</td>
-                  <td>{fact}</td>
+                  <td>{factCompra}</td>
+                  <td>{value.flag_automatic_match === "1" ? 'A' : 'M'}</td>
+                  <td>
+                    <input type='checkbox'/>
+                  </td>
                 </tr>
               )})
               }

@@ -19,18 +19,19 @@ export const  apis = {
     },
 
     /*MATCH SERVICEs*/
-    getMatch: async (idProveedor, idPlanta, fechaInicial, fechaFinal,token) => {
-      try{
-          const solicitud = await fetch(`${url}/Docs_sale_purchase/${fechaInicial}/${fechaFinal}/${idPlanta}/${idProveedor}`, optionGet(token))
-          const res = await solicitud.json()
-          return res
-      }catch(err){
-          return {error: 'Ocurrió un error en la solicitud para la lista de Ventas.'}
-      }
+    getMatch: (idProveedor, idPlanta, fechaInicial, fechaFinal, token) => {
+      return fetch(`${url}/Docs_sale_purchase/${fechaInicial}/${fechaFinal}/${idPlanta}/${idProveedor}`, {
+        method: 'GET', 
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }).then(res => {
+        return res.json()
+      })
     },
 
     getVentas: async (articulo, idProveedor, idPlanta, fechaInicial, fechaFinal,token) => {
-    console.log(token)
       try{
           const solicitud = await fetch(`${url}/Documento/sales/${fechaInicial}/${fechaFinal}/${idPlanta}/${idProveedor}/${articulo}`, optionGet(token))
           const res = await solicitud.json()
@@ -41,7 +42,6 @@ export const  apis = {
     },
 
     getCompras: async (articulo, idProveedor, idPlanta, fechaInicial, fechaFinal,token) => {
-    console.log(token)
       try{
           const solicitud = await fetch(`${url}/Docs_Purchase/${fechaInicial}/${fechaFinal}/${idPlanta}/${idProveedor}/${articulo}`, optionGet(token))
           const res = await solicitud.json()
