@@ -38,6 +38,11 @@ export const ModalMatch = ({accederLogin}) => {
           this.props.accederLogin(false)
           return
         }
+        if( !config.validarCookies()){
+          config.cerrarSesion()
+          this.props.accederLogin(false)
+          return
+        }
         swal("Mensaje", "Ocurrió un error en la solicitud para la lista de Matchs.", "error")
       }
     }
