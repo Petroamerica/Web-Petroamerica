@@ -71,7 +71,6 @@ const Match = ({accederLogin}) => {
         return lastCompra
       })
     }
-    console.log(selectedCompra)
   }
 
   const handleCheckboxVenta = (e, value) => {
@@ -81,12 +80,10 @@ const Match = ({accederLogin}) => {
     } else {
       setSelectedVenta(prev => prev.filter(e => e.fact !== value.fact))
     }
-    console.log(selectedVenta)
   }
 
   React.useEffect(() => {
     (async () => {
-      // window.localStorage.setItem('selectedVenta', JSON.stringify(selectedVenta))
       setVentas(prev => ({
         ...prev,
         estado: {
@@ -96,7 +93,6 @@ const Match = ({accederLogin}) => {
         }
       }))
       const ventasData  = await apis.getVentas('-', '-', '-', ventas.filtros.fecha, ventas.filtros.fecha, userL.token)
-      console.log({ventasData})
       if(ventasData.error){
         if(!config.validarCookies()){
           await swal("Mensaje", "Tiempo de sesión culminado.", "error")
@@ -135,7 +131,6 @@ const Match = ({accederLogin}) => {
         }
       }))
       const comprasData  = await apis.getCompras('-', '-', '-', compras.filtros.fecha, compras.filtros.fecha, userL.token)
-      console.log({comprasData})
       if(comprasData.error){
         if(!config.validarCookies()){
           await swal("Mensaje", "Tiempo de sesión culminado.", "error")
@@ -279,7 +274,9 @@ const Match = ({accederLogin}) => {
                  isEqual = mapdata[index-1].fact === value.fact
                 }
                 return ( 
-                  <tr key={index} >
+                  <tr key={index} style={{
+                      borderTop: `${isEqual && '2px solid #fff'}`,
+                    }}>
                     <td>{ !isEqual && value.planta }</td>
                     <td>{ !isEqual ? value.fact : value.fact + ' +'}</td>
                     <td>{ !isEqual && value.proveedor}</td>
