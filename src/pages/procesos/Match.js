@@ -8,7 +8,6 @@ import Header from "../../components/header/header"
 import filter from '../../img/filter.svg'
 import { config } from "../../config/config"
 import { usePlantas } from "../../hooks/usePlantas"
-import { useProveedores } from "../../hooks/useProveedores"
 import { ModalMatch } from '../../components/modal/modalMatch'
 import { apis } from '../../api/apis.js'
 import { ParseFactCompra, ParseFactVenta } from '../../utils/parseFact'
@@ -24,7 +23,6 @@ const Match = ({accederLogin}) => {
     username: ""
   })
 
-  const { proveedores } = useProveedores({accederLogin})
   const { plantas } = usePlantas({accederLogin})
 
   const [ventas, setVentas] = React.useState({
@@ -59,7 +57,6 @@ const Match = ({accederLogin}) => {
 
 
   const handleCheckboxCompra = (e, value) => {
-    const fact = ParseFactCompra(value)
     if(selectedCompra.findIndex(e => e.fact === value.fact) === -1) {
       setSelectedCompra(prev => [...prev, value])
     } else {
@@ -74,7 +71,6 @@ const Match = ({accederLogin}) => {
   }
 
   const handleCheckboxVenta = (e, value) => {
-    const fact = ParseFactVenta(value)
     if(selectedVenta.findIndex(e => e.fact === value.fact) === -1) {
       setSelectedVenta(prev => [...prev, value])
     } else {
@@ -181,49 +177,50 @@ const Match = ({accederLogin}) => {
       gap: "30px",
     }}>
       <div style={{
+          display: 'flex',
+          padding: 20,
+          gap: '20px',
+          boxShadow: '0px 0px 8px 0px rgba(0,0,0,0.15)',
+        }}>
+        <div>
+          <Button 
+            onClick={() => {
+              setVentas(prev  => ({
+                ...prev,
+                filtros: {
+                  ...prev.filtros,
+                  planta: 'TODAS',
+                  proveedor: 'TODAS',
+                  articulo: '-',
+                },
+              }))
+              setCompras(prev  => ({
+                ...prev,
+                filtros: {
+                  ...prev.filtros,
+                  planta: 'TODAS',
+                  proveedor: 'TODAS',
+                  articulo: '-',
+                },
+              }))
+              setMode(!mode)
+            }}
+          >
+            <img src={filter} alt='filter' width='20'/>
+          </Button>
+        </div>
+        <div>
+          <ModalMatch/>
+        </div>
+      </div>
+      <div style={{
         display: 'flex', 
         padding: 20,
-        gap: '20px',
+        gap: '25px',
         minHeight: '500px',
         boxShadow: '0px 0px 8px 0px rgba(0,0,0,0.15)',
       }}>
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '20px'
-          }}>
-            <div>
-              <Button 
-                onClick={() => {
-                  setVentas(prev  => ({
-                    ...prev,
-                    filtros: {
-                      ...prev.filtros,
-                      planta: 'TODAS',
-                      proveedor: 'TODAS',
-                      articulo: '-',
-                    },
-                  }))
-                  setCompras(prev  => ({
-                    ...prev,
-                    filtros: {
-                      ...prev.filtros,
-                      planta: 'TODAS',
-                      proveedor: 'TODAS',
-                      articulo: '-',
-                    },
-                  }))
-                  setMode(!mode)
-                }}
-              >
-                <img src={filter} alt='filter' width='20'/>
-              </Button>
-            </div>
-            <div>
-              <ModalMatch/>
-            </div>
-        </div>
-        <div style={{marginRight: '40px'}}>
+        <div style={{marginRight: '20px'}}>
           <h6>VENTAS</h6>
           <Col sm="4">
             <Form.Group className="mb-3">
@@ -269,7 +266,6 @@ const Match = ({accederLogin}) => {
                     return (ventas.filtros.proveedor === 'TODAS') ? true : e.proveedor === ventas.filtros.proveedor
                   }) 
                 let isEqual = false
-                let nrpCop = ''
                 if(index >= 1) {
                  isEqual = mapdata[index-1].fact === value.fact
                 }
