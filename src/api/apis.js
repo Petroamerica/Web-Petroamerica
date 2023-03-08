@@ -19,6 +19,27 @@ export const  apis = {
     },
 
     /*MATCH SERVICEs*/
+    postMatch: (token, data) => {
+      return fetch(`${url}/Docs_sale_purchase`, {
+        method: 'DELETE', 
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+    },
+
+    deleteMatch: (ID_PLANTA, ID_TIPO_DOC, SERIE, NRO_DOCUMENTO, ID_PLANTA_PUR, ID_PROVEEDOR_PUR, ID_TIPO_DOC_PUR, SERIE_DOC_PUR, NRO_DOC_PUR, token) => { 
+    return fetch(`${url}/Docs_sale_purchase/${ID_PLANTA}/${ID_TIPO_DOC}/${SERIE}/${NRO_DOCUMENTO}/${ID_PLANTA_PUR}/${ID_PROVEEDOR_PUR}/${ID_TIPO_DOC_PUR}/${SERIE_DOC_PUR}/${NRO_DOC_PUR}`, {
+        method: 'DELETE', 
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      })
+    },
+ 
     getMatch: (idProveedor, idPlanta, fechaInicial, fechaFinal, token) => {
       return fetch(`${url}/Docs_sale_purchase/${fechaInicial}/${fechaFinal}/${idPlanta}/${idProveedor}`, {
         method: 'GET', 

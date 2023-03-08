@@ -33,6 +33,10 @@ const FiltrosMatch = ({plantas, setFiltros, setCompras, setVentas, filtros, acce
       }
       prov.unshift({id_proovedor: '-', descripcion: 'TODAS'})
       setProveedores(prov)
+      setProveedores(e => {
+        console.log(e)
+        return e
+      })
     })()
   },[token, filtros.filtros.fecha, filtros.filtros.planta ])
 

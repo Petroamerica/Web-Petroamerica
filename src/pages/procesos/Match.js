@@ -8,6 +8,7 @@ import Header from "../../components/header/header"
 import filter from '../../img/filter.svg'
 import { config } from "../../config/config"
 import { usePlantas } from "../../hooks/usePlantas"
+import { useProveedores } from "../../hooks/useProveedores"
 import { ModalMatch } from '../../components/modal/modalMatch'
 import { apis } from '../../api/apis.js'
 import { ParseFactCompra, ParseFactVenta } from '../../utils/parseFact'
@@ -15,6 +16,7 @@ import { ParseFactCompra, ParseFactVenta } from '../../utils/parseFact'
 const Match = ({accederLogin}) => {
   const [selectedCompra,  setSelectedCompra] = React.useState([])
   const [selectedVenta,  setSelectedVenta] = React.useState([])
+
 
   const [mode, setMode] = React.useState(false)
 
@@ -24,6 +26,7 @@ const Match = ({accederLogin}) => {
   })
 
   const { plantas } = usePlantas({accederLogin})
+  const { proveedores } = useProveedores({accederLogin})
 
   const [ventas, setVentas] = React.useState({
     filtros: {
@@ -61,12 +64,15 @@ const Match = ({accederLogin}) => {
       setSelectedCompra(prev => [...prev, value])
     } else {
       setSelectedCompra(prev => prev.filter(e => e.fact !== value.fact))
+      setSelectedVenta([])
+      console.log(selectedVenta)
+      /*
       setSelectedCompra(lastCompra => {
         if(lastCompra.length === 0) {
-          setSelectedVenta([])
         }
         return lastCompra
       })
+      */
     }
   }
 
@@ -76,6 +82,28 @@ const Match = ({accederLogin}) => {
     } else {
       setSelectedVenta(prev => prev.filter(e => e.fact !== value.fact))
     }
+  }
+
+  const handleMatch = () => {
+    console.log(selectedCompra)
+    console.log(selectedVenta)
+    console.log(proveedores)
+    if(selectedCompra.length === 1) {
+      selectedVenta.map(sale => {
+        console.log({
+          id_planta: plantas.find(e => e.descripcion === sale.planta).id_planta,
+          id_tipo_doc: sale.id_tipo_doc,
+          serie: sale.serie,
+          nro_documento: sale.nro_documento,
+          id_Planta_pur: plantas.find(e => e.descripcion === selectedCompra[0].planta).id_planta, 
+          id_Proveedor_pur: proveedores.find(e => e.descripcion === selectedCompra[0].proveedor).id_proveedor,
+          id_tipo_doc_pur: selectedCompra[0].id_tipo_doc,
+          serie_doc_pur: selectedCompra[0].serie_doc,
+          nro_doc_pur: selectedCompra[0].nro_doc
+        })
+      })
+    }
+    swal("Mensaje", "Match logrado correctamente", "success")
   }
 
   React.useEffect(() => {
@@ -164,6 +192,13 @@ const Match = ({accederLogin}) => {
       }else{
         await swal("Mensaje", "No se encontraron las credenciales para acceder a la web 'REGISTRO DE VOLUMETRICO' .\nSalir y volver a ingresar." ,"error")
         return }
+      if(!config.validarCookies()){
+        await swal("Mensaje", "Tiempo de sesión culminado.", "error")
+        config.cerrarSesion()
+        accederLogin(false)
+      }
+      await swal("Mensaje", ventas.error , "error")
+      return
     })()
   },[])
 
@@ -210,7 +245,22 @@ const Match = ({accederLogin}) => {
           </Button>
         </div>
         <div>
-          <ModalMatch/>
+          <Button
+          type="button" disabled={
+              selectedCompra.reduce((acc, obj) => acc + obj.cantidad, 0) === 0 ? true 
+              : !(selectedCompra.reduce((acc, obj) => acc + obj.cantidad, 0) === 
+                selectedVenta.reduce((acc, obj) => acc + obj.cantidad, 0 ))
+          }
+          onClick={handleMatch}
+          >
+            Enlazar
+          </Button>
+        </div>
+        <div>
+          <ModalMatch 
+              mode={mode}
+              accederLogin={accederLogin}
+            />
         </div>
       </div>
       <div style={{
@@ -281,8 +331,6 @@ const Match = ({accederLogin}) => {
                     <td>{value.articulo}</td>
                     <td>{value.cantidad}</td>
                     <td>
-                      {
-                      !isEqual &&
                       <div style={{
                         display: 'flex',
                         justifyContent: 'center',
@@ -294,9 +342,9 @@ const Match = ({accederLogin}) => {
                             : value.cantidad > selectedCompra[0].cantidad ? true
                             : (selectedVenta.length === 0) ? false 
                             : (selectedVenta.reduce((acc, obj) => acc + obj.cantidad, 0) <=
-                              selectedCompra[0].cantidad) && (selectedVenta.findIndex(e => e.fact === value.fact) !== -1) ? false 
+                              selectedCompra.reduce((acc, obj) => acc + obj.cantidad, 0)) && (selectedVenta.findIndex(e => e.fact === value.fact) !== -1) ? false 
                             : (selectedVenta.reduce((acc, obj) => acc + obj.cantidad, 0) + value.cantidad) <=
-                              selectedCompra[0].cantidad ? false 
+                              selectedCompra.reduce((acc, obj) => acc + obj.cantidad, 0) ? false 
                             : true
                           }
                           checked={selectedVenta.findIndex(e => e.fact === value.fact) === -1 ? false : true}
@@ -306,7 +354,6 @@ const Match = ({accederLogin}) => {
                           height: '19px'
                         }}/>
                       </div>
-                      }
                     </td>
                   </tr>
                 )}
@@ -328,11 +375,6 @@ const Match = ({accederLogin}) => {
                 <h6>No hay datos de ventas</h6>
               </div>
              }
-          </div>
-          <div style={{ display: 'flex', maxWidth: '500px', flexDirection: 'column'}}>
-          <div>{"selectedVenta :" + JSON.stringify(selectedVenta)}</div>
-          <br/>
-          <div>{"selectedCompra :" + JSON.stringify(selectedCompra)}</div>
           </div>
         </div>
         <div>
@@ -387,26 +429,19 @@ const Match = ({accederLogin}) => {
                   return (
                     <tr key={index}>
                       <td >
-                        {!isEqual && 
-                          <div style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                          }}>
-                            <input type='checkbox'
-                              name={value.fact}
-                              disabled={
-                                selectedCompra.length === 0 
-                                ? false 
-                                : (selectedCompra.findIndex(e => e.fact === value.fact )) === -1 ? true : false
-                              }
-                              checked={selectedCompra.findIndex(e => e.fact === value.fact) === -1 ? false : true}
-                              onChange={e => handleCheckboxCompra(e, value)}
-                              style={{
-                              width: '19px',
-                              height: '19px'
-                            }}/>
-                          </div>
-                        }
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                        }}>
+                          <input type='checkbox'
+                            name={value.fact}
+                            checked={selectedCompra.findIndex(e => e.fact === value.fact) === -1 ? false : true}
+                            onChange={e => handleCheckboxCompra(e, value)}
+                            style={{
+                            width: '19px',
+                            height: '19px'
+                          }}/>
+                        </div>
                       </td>
                       <td >{ !isEqual && value.planta }</td>
                       <td >{ !isEqual ? value.fact : value.fact + ' +'}</td>
