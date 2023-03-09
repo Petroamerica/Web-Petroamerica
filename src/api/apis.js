@@ -21,7 +21,7 @@ export const  apis = {
     /*MATCH SERVICEs*/
     postMatch: (token, data) => {
       return fetch(`${url}/Docs_sale_purchase`, {
-        method: 'DELETE', 
+        method: 'POST', 
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -30,8 +30,7 @@ export const  apis = {
       })
     },
 
-    deleteMatch: (ID_PLANTA, ID_TIPO_DOC, SERIE, NRO_DOCUMENTO, ID_PLANTA_PUR, ID_PROVEEDOR_PUR, ID_TIPO_DOC_PUR, SERIE_DOC_PUR, NRO_DOC_PUR, token) => { 
-    return fetch(`${url}/Docs_sale_purchase/${ID_PLANTA}/${ID_TIPO_DOC}/${SERIE}/${NRO_DOCUMENTO}/${ID_PLANTA_PUR}/${ID_PROVEEDOR_PUR}/${ID_TIPO_DOC_PUR}/${SERIE_DOC_PUR}/${NRO_DOC_PUR}`, {
+    deleteMatch: (ID_PLANTA, ID_TIPO_DOC, SERIE, NRO_DOCUMENTO, ID_PLANTA_PUR, ID_PROVEEDOR_PUR, ID_TIPO_DOC_PUR, SERIE_DOC_PUR, NRO_DOC_PUR, token) => { return fetch(`${url}/Docs_sale_purchase/${ID_PLANTA}/${ID_TIPO_DOC}/${SERIE}/${NRO_DOCUMENTO}/${ID_PLANTA_PUR}/${ID_PROVEEDOR_PUR}/${ID_TIPO_DOC_PUR}/${SERIE_DOC_PUR}/${NRO_DOC_PUR}`, {
         method: 'DELETE', 
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -58,7 +57,7 @@ export const  apis = {
           const res = await solicitud.json()
           return res
       }catch(err){
-          return {error: 'Ocurrió un error en la solicitud para la lista de Ventas.'}
+        return {error: 'Ocurrió un error en la solicitud para la lista de Ventas.'}
       }
     },
 
@@ -68,6 +67,7 @@ export const  apis = {
           const res = await solicitud.json()
           return res
       }catch(err){
+        console.log(err)
           return {error: 'Ocurrió un error en la solicitud para la lista de Compras.'}
       }
     },

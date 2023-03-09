@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import {Button, Modal, Form, Col, Spinner } from 'react-bootstrap';
 import allData from '../../img/allData.svg';
 import TablaControl from '../table/table';
 import FiltroMatch from '../filtros/filtroMatch'
@@ -9,6 +8,7 @@ import { config } from '../../config/config'
 import { usePlantas } from '../../hooks/usePlantas'
 import { useProveedores } from '../../hooks/useProveedores'
 import swal from 'sweetalert';
+import moment from 'moment';
 
 export const ModalMatch = ({mode, accederLogin}) => {
   const [ show, setShow ] = useState(false);
@@ -18,11 +18,15 @@ export const ModalMatch = ({mode, accederLogin}) => {
   const [mapChecked, setMapChecked] = useState([])
   const [match, setMatch] = useState({
     filtros: {
-      fecha: '',
+      fecha: moment().format('YYYY-MM-DD').toString(),
       planta: 'TODAS',
       proveedor: 'TODAS'
     },
     data: [],
+    estado: {
+      error: false,
+      loading: false,
+    }
   });
 
   const handleCheBox = (value) => {
@@ -35,11 +39,11 @@ export const ModalMatch = ({mode, accederLogin}) => {
 
  
   React.useEffect(() => {
-    const {user, token} = config.obtenerLocalStorage()
+    const {token} = config.obtenerLocalStorage()
     
     async function fetchData() {
       try {
-        const data = await apis.getMatch('-', '-', '2023-02-10', '2023-02-10', token) 
+        const data = await apis.getMatch('-', '-', match.filtros.fecha, match.filtros.fecha, token) 
         setMatch(prev => ({
           ...prev,
           data: data.map(value => {
@@ -49,21 +53,9 @@ export const ModalMatch = ({mode, accederLogin}) => {
             factCompra: value.id_tipo_doc_pur.substring(1,0) + value.serie_pur.substring(1) + "-" + value.nro_documento_pur  })
           }),
         }))
-        //setMapChecked(prev => {
-        // let temp = data.map(value => (
-        //    value.id_tipo_doc_pur.substring(1,0) + value.serie_pur.substring(1) + "-" + value.nro_documento_pur  
-        //   ))
-        //   return [...new Set(temp)]
-        //})
       } catch (error) {
         console.log(error)
-        if(error.status === 401) {
-          swal("Mensaje", "Tiempo de sesión culminado.", "error")
-          config.cerrarSesion()
-          accederLogin(false)
-          return
-        }
-        if(!config.validarCookies()){
+        if(error.status === 401 || !config.validarCookies()) {
           swal("Mensaje", "Tiempo de sesión culminado.", "error")
           config.cerrarSesion()
           accederLogin(false)
@@ -73,20 +65,52 @@ export const ModalMatch = ({mode, accederLogin}) => {
       }
     }
     return fetchData()
-  }, [mode]) 
+  }, [mode,accederLogin, match.filtros.fecha]) 
 
-  const handleClose = () => {
+  const handleDeleteData = () => {
+    const { token } = config.obtenerLocalStorage()
     mapChecked.forEach((value) => {
-      console.log(plantas)
       let planta_sale = plantas.find(e => e.descripcion === value.planta).id_planta
       let planta_pur = plantas.find(e => e.descripcion === value.planta_pur).id_planta
       let id_proveedor = proveedores.find(e => e.descripcion === value.proveedor_pur).id_proveedor
+      try{
+        apis.deleteMatch(planta_sale,
+          value.id_tipo_doc,
+          value.serie,
+          value.nro_documento,
+          planta_pur,
+          id_proveedor,
+          value.id_tipo_doc_pur,
+          value.serie_pur,
+          value.nro_documento_pur,
+          token
+        )
+
+        // reset states
+        setMatch(prev => ({
+          ...prev,
+          data: match.data.filter(e => e.factVenta !== value.factVenta)
+        }))
+        setMapChecked([])
+        // reset states
+
+      }catch(error) {
+        console.log(error)
+        if(error.status === 401 || !config.validarCookies()) {
+          swal("Mensaje", "Tiempo de sesión culminado.", "error")
+          config.cerrarSesion()
+          accederLogin(false)
+          return
+        }
+        swal("Mensaje", "Ocurrió un error al eliminar el Match seleccionado", "error")
+      }
       console.log(`/Docs_sale_purchase/${planta_sale}/${value.id_tipo_doc}/${value.serie}/${value.nro_documento}/
       ${planta_pur}/${id_proveedor}/${value.id_tipo_doc_pur}/${value.serie_pur}/${value.nro_documento_pur}`)
     })
     setShow(false)
   };
 
+  const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
   return (
@@ -100,7 +124,25 @@ export const ModalMatch = ({mode, accederLogin}) => {
           <Modal.Title>Articulos Enlazados</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div style={{display: 'flex', gap:'30px', justifyContent: 'center'}}>
+          <Col sm="2">
+            <Form.Group className="mb-3">
+              <Form.Text className="text-muted">Fecha inicial</Form.Text>
+              <Form.Control 
+              type="date"
+              name='fechaInicioVentas'
+
+              onChange={(e) => setMatch(prev => ({
+              ...prev,
+              filtros: {
+                ...prev.filtros,
+               fecha: e.target.value
+              }}))}
+              value={match.filtros.fecha}
+              style={{fontSize:'0.9rem'}}/>
+            </Form.Group>
+          </Col>
+          <hr/>
+          <div style={{flexDirection:'column', display: 'flex', gap:'10px', alignItems: 'center'}}>
             <TablaControl
               cols={["Planta","Proveedor", "Fact", "Fecha", "Scope" , "Planta - Compra", "Proveedor - Compra", "Fact - Compra", "Scope - Compra",  "Match", ""]}
               mode={false}
@@ -117,37 +159,55 @@ export const ModalMatch = ({mode, accederLogin}) => {
               }
               return(
                   <tr key={index} style={{
-                      borderTop: `${isEqual && '2px solid #fff'}`,
-                      backgroundColor: `${value.color_order === 0 ? 'red' : '#FFF'}`
+                      background: `${value.color_order === '1' && '#d0eae8' }`
                   }}>
-                  <td>{ value.planta }</td>
-                  <td>{ !isEqual && value.proveedor }</td>
-                  <td>{ !isEqual ? value.factVenta : value.factVenta + ' +'}</td>
-                  <td>{ !isEqual && new Date(value.fecha).toLocaleDateString()}</td>
-                  <td>{ value.nro_scop }</td>
-                  <td>{ value.planta_pur}</td>
-                  <td>{ !isEqual && value.proveedor_pur}</td>
-                  <td>{ value.factCompra}</td>
-                  <td>{ value.nro_scop_pur }</td>
-                  <td>{ !isEqual && (value.flag_automatic_match === "1" && 'A' )}</td>
-                  <td>
-                    <input 
-                      type='checkbox'
-                      checked={mapChecked.findIndex(e => e.factCompra === value.factCompra) === -1 ? false : true}
-                      onChange={e => handleCheBox(value)}
-                      /> 
-                  </td>
+                    <td>{ value.planta }</td>
+                    <td>{ !isEqual && value.proveedor }</td>
+                    <td>{ !isEqual ? value.factVenta : value.factVenta + ' +'}</td>
+                    <td>{ !isEqual && new Date(value.fecha).toLocaleDateString()}</td>
+                    <td>{ value.nro_scop }</td>
+                    <td>{ value.planta_pur}</td>
+                    <td>{ !isEqual && value.proveedor_pur}</td>
+                    <td>{ value.factCompra}</td>
+                    <td>{ value.nro_scop_pur }</td>
+                    <td>{ !isEqual && (value.flag_automatic_match === "1" && 'A' )}</td>
+                    <td>
+                      {
+                        !isEqual &&
+                        <input 
+                          type='checkbox'
+                          checked={mapChecked.findIndex(e => e.factCompra === value.factCompra) === -1 ? false : true}
+                          onChange={e => handleCheBox(value)}
+                          /> 
+                      }
+                    </td>
                 </tr>
               )})
               }
             </TablaControl>
+            {match.estado.loading && 
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+              }}>
+                <Spinner animation="border" />
+              </div>
+            }
+            {match.data.length === 0 && 
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+              }}>
+                <h6>No hay articulos Enlazados</h6>
+              </div>
+             }
           </div>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Cerrar
           </Button>
-          <Button variant="danger" onClick={handleClose}>
+          <Button variant="danger" onClick={handleDeleteData}>
             Guarda Cambios
           </Button>
         </Modal.Footer>

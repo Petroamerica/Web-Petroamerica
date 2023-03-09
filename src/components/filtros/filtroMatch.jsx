@@ -10,7 +10,7 @@ import swal from 'sweetalert'
 
 const FiltrosMatch = ({plantas, setFiltros, setCompras, setVentas, filtros, accederLogin}) => {
   const [proveedores, setProveedores] = React.useState([])
-  const {user, token} = config.obtenerLocalStorage()
+  const {token} = config.obtenerLocalStorage()
 
   React.useEffect(() => {
     (async () => {
@@ -38,7 +38,7 @@ const FiltrosMatch = ({plantas, setFiltros, setCompras, setVentas, filtros, acce
         return e
       })
     })()
-  },[token, filtros.filtros.fecha, filtros.filtros.planta ])
+  },[token, filtros.filtros.fecha, filtros.filtros.planta, plantas, accederLogin])
 
   const handleOnSubmit = (e) => {
     e.preventDefault()
