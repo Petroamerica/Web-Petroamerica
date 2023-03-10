@@ -149,48 +149,77 @@ export const ModalMatch = ({accederLogin, reload}) => {
                 style={{fontSize:'0.9rem'}}/>
               </Form.Group>
             </Col>
+            <Col sm="2">
+              <Form.Text 
+              className="text-muted">Planta</Form.Text> 
+              <Form.Select 
+              value={match.filtros.planta} 
+              name='planta' 
+              onChange={(e) => {
+                setMatch(prev => ({
+                ...prev,
+                filtros: {
+                  ...prev.filtros,
+                planta: e.target.value
+                }}))
+              }}
+              style={{fontSize:'0.9rem'}}>
+                <option 
+                >Seleccionar...</option>
+                {
+                  plantas.map((value, index) =>
+                    <option key={index} value={value.description}>{value.descripcion}</option>
+                  )
+                }
+              </Form.Select>
+            </Col>
           </Row>
           <hr/>
-          <div style={{flexDirection:'column', display: 'flex', gap:'10px', alignItems: 'center'}}>
+          <div style={{ overflowY:'scroll', maxHeight:'70vh', flexDirection:'column', display: 'flex', gap:'10px', alignItems: 'center'}}>
             <TablaControl
               cols={["Planta","Proveedor", "Fact", "Fecha", "Scope" , "Planta - Compra", "Proveedor - Compra", "Fact - Compra", "Scope - Compra",  "Match", ""]}
             > 
-              {match.data.map((value, index) => {
-              const mapdata = match.data.filter(e => {
-                  return (match.filtros.planta === 'TODAS') ? true : e.planta === match.filtros.planta
+              {match.data.filter(e => {
+                    return (match.filtros.planta === 'TODAS') ? true : e.planta === match.filtros.planta
                 }).filter(e => {
-                  return (match.filtros.proveedor === 'TODAS') ? true : e.proveedor === match.filtros.proveedor
-                }) 
-              let isEqual = false
-              if(index >= 1) {
-               isEqual = mapdata[index-1].factVenta === value.factVenta
-              }
-              return(
-                  <tr key={index} style={{
-                      background: `${value.color_order === '1' && '#d0eae8' }`
-                  }}>
-                    <td>{ value.planta }</td>
-                    <td>{ !isEqual && value.proveedor }</td>
-                    <td>{ !isEqual ? value.factVenta : value.factVenta + ' +'}</td>
-                    <td>{ !isEqual && new Date(value.fecha).toLocaleDateString()}</td>
-                    <td>{ value.nro_scop }</td>
-                    <td>{ value.planta_pur}</td>
-                    <td>{ !isEqual && value.proveedor_pur}</td>
-                    <td>{ value.factCompra}</td>
-                    <td>{ value.nro_scop_pur }</td>
-                    <td>{ !isEqual && (value.flag_automatic_match === "1" && 'A' )}</td>
-                    <td>
-                      {
-                        !isEqual &&
-                        <input 
-                          type='checkbox'
-                          checked={mapChecked.findIndex(e => e.factCompra === value.factCompra) === -1 ? false : true}
-                          onChange={e => handleCheBox(value)}
-                          /> 
-                      }
-                    </td>
-                </tr>
-              )})
+                    return (match.filtros.proveedor === 'TODAS') ? true : e.proveedor === match.filtros.proveedor
+                }).map((value, index) => {
+                  const mapdata = match.data.filter(e => {
+                      return (match.filtros.planta === 'TODAS') ? true : e.planta === match.filtros.planta
+                  }).filter(e => {
+                      return (match.filtros.proveedor === 'TODAS') ? true : e.proveedor === match.filtros.proveedor
+                  }) 
+                  let isEqual = false
+                  if(index >= 1) {
+                    console.log(mapdata[index-1], mapdata.length, index)
+                    isEqual = mapdata[index-1].factVenta === value.factVenta
+                  }
+                return(
+                    <tr key={index} style={{
+                        background: `${value.color_order === '1' && '#d0eae8' }`
+                    }}>
+                      <td>{ value.planta }</td>
+                      <td>{ !isEqual && value.proveedor }</td>
+                      <td>{ !isEqual ? value.factVenta : value.factVenta + ' +'}</td>
+                      <td>{ !isEqual && new Date(value.fecha).toLocaleDateString()}</td>
+                      <td>{ value.nro_scop }</td>
+                      <td>{ value.planta_pur}</td>
+                      <td>{ !isEqual && value.proveedor_pur}</td>
+                      <td>{ value.factCompra}</td>
+                      <td>{ value.nro_scop_pur }</td>
+                      <td>{ !isEqual && (value.flag_automatic_match === "1" && 'A' )}</td>
+                      <td>
+                        {
+                          !isEqual &&
+                          <input 
+                            type='checkbox'
+                            checked={mapChecked.findIndex(e => e.factCompra === value.factCompra) === -1 ? false : true}
+                            onChange={e => handleCheBox(value)}
+                            /> 
+                        }
+                      </td>
+                  </tr>
+                )})
               }
             </TablaControl>
             {match.estado.loading && 

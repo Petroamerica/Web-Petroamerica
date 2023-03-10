@@ -1,5 +1,5 @@
 import React from "react"
-import { Col, Form, Row } from "react-bootstrap"
+import {  Col, Form, Row } from "react-bootstrap"
 import { config } from '../../config/config'
 import { apis } from '../../api/apis'
 import swal from 'sweetalert'

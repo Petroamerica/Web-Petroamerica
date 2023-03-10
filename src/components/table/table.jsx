@@ -7,11 +7,8 @@ const TablaControl = ({cols, children }) => {
     <Table  bordered size="md" responsive style={{ 
       fontSize:'0.8rem',
       minWidth: '500px',
-      maxWidth: '700px'
     }} >
       <thead style={{
-        //width:'100%',
-        //position:'fixed'
       }}>
         <tr>
           {cols.map((value, index) => (
