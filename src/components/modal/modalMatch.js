@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import {Button, Modal, Form, Col, Spinner } from 'react-bootstrap';
+import React, { useReducer, useState } from 'react';
+import {Button, Modal, Row, Form, Col, Spinner } from 'react-bootstrap';
 import allData from '../../img/allData.svg';
 import TablaControl from '../table/table';
-import FiltroMatch from '../filtros/filtroMatch'
 import { apis } from '../../api/apis'
 import { config } from '../../config/config'
 import { usePlantas } from '../../hooks/usePlantas'
@@ -10,10 +9,14 @@ import { useProveedores } from '../../hooks/useProveedores'
 import swal from 'sweetalert';
 import moment from 'moment';
 
-export const ModalMatch = ({mode, accederLogin}) => {
+export const ModalMatch = ({accederLogin, reload}) => {
   const [ show, setShow ] = useState(false);
   const { plantas } = usePlantas({accederLogin})
   const { proveedores } = useProveedores({accederLogin})
+
+  // reload matchs trick 
+  const [reloadMatchs, setReloadMatchs] = useReducer(x => x + 1 ,0)
+
   const [proveedoresFilter, setProveedoresFilter] = useState([])
   const [mapChecked, setMapChecked] = useState([])
   const [match, setMatch] = useState({
@@ -65,15 +68,16 @@ export const ModalMatch = ({mode, accederLogin}) => {
       }
     }
     return fetchData()
-  }, [mode,accederLogin, match.filtros.fecha]) 
+  }, [accederLogin, match.filtros.fecha, reloadMatchs]) 
 
   const handleDeleteData = () => {
     const { token } = config.obtenerLocalStorage()
-    mapChecked.forEach((value) => {
-      let planta_sale = plantas.find(e => e.descripcion === value.planta).id_planta
-      let planta_pur = plantas.find(e => e.descripcion === value.planta_pur).id_planta
-      let id_proveedor = proveedores.find(e => e.descripcion === value.proveedor_pur).id_proveedor
-      try{
+    console.log(mapChecked)
+    try{
+      mapChecked.forEach((value) => {
+        let planta_sale = plantas.find(e => e.descripcion === value.planta).id_planta
+        let planta_pur = plantas.find(e => e.descripcion === value.planta_pur).id_planta
+        let id_proveedor = proveedores.find(e => e.descripcion === value.proveedor_pur).id_proveedor
         apis.deleteMatch(planta_sale,
           value.id_tipo_doc,
           value.serie,
@@ -85,33 +89,36 @@ export const ModalMatch = ({mode, accederLogin}) => {
           value.nro_documento_pur,
           token
         )
+      })
+      // reset states
+      setMatch(prev => ({
+        ...prev,
+        data: match.data.filter(e => mapChecked.findIndex(y => e.factVenta === y.factVenta) === -1)
+      }))
+      setMapChecked([])
 
-        // reset states
-        setMatch(prev => ({
-          ...prev,
-          data: match.data.filter(e => e.factVenta !== value.factVenta)
-        }))
-        setMapChecked([])
-        // reset states
-
-      }catch(error) {
-        console.log(error)
-        if(error.status === 401 || !config.validarCookies()) {
-          swal("Mensaje", "Tiempo de sesión culminado.", "error")
-          config.cerrarSesion()
-          accederLogin(false)
-          return
-        }
-        swal("Mensaje", "Ocurrió un error al eliminar el Match seleccionado", "error")
+      // success delay 
+      setTimeout(() => {
+        swal("Mensaje", "Match eliminado correctamente", "success")
+        reload()
+      }, 250)
+    }catch(error) {
+      console.log(error)
+      if(error.status === 401 || !config.validarCookies()) {
+        swal("Mensaje", "Tiempo de sesión culminado.", "error")
+        config.cerrarSesion()
+        accederLogin(false)
+        return
       }
-      console.log(`/Docs_sale_purchase/${planta_sale}/${value.id_tipo_doc}/${value.serie}/${value.nro_documento}/
-      ${planta_pur}/${id_proveedor}/${value.id_tipo_doc_pur}/${value.serie_pur}/${value.nro_documento_pur}`)
-    })
-    setShow(false)
+      swal("Mensaje", "Ocurrió un error al eliminar el Match seleccionado", "error")
+    }
   };
 
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleShow = () => {
+    setShow(true)
+    setReloadMatchs()
+  }
 
   return (
     <>
@@ -124,28 +131,29 @@ export const ModalMatch = ({mode, accederLogin}) => {
           <Modal.Title>Articulos Enlazados</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Col sm="2">
-            <Form.Group className="mb-3">
-              <Form.Text className="text-muted">Fecha inicial</Form.Text>
-              <Form.Control 
-              type="date"
-              name='fechaInicioVentas'
-
-              onChange={(e) => setMatch(prev => ({
-              ...prev,
-              filtros: {
-                ...prev.filtros,
-               fecha: e.target.value
-              }}))}
-              value={match.filtros.fecha}
-              style={{fontSize:'0.9rem'}}/>
-            </Form.Group>
-          </Col>
+          <Row>
+            <Col sm="2">
+              <Form.Group className="mb-3">
+                <Form.Text className="text-muted">Fecha inicial</Form.Text>
+                <Form.Control 
+                type="date"
+                name='fechaInicioVentas'
+                onChange={(e) => setMatch(prev => ({
+                  ...prev,
+                  filtros: {
+                    ...prev.filtros,
+                  fecha: e.target.value
+                  }})
+                )}
+                value={match.filtros.fecha}
+                style={{fontSize:'0.9rem'}}/>
+              </Form.Group>
+            </Col>
+          </Row>
           <hr/>
           <div style={{flexDirection:'column', display: 'flex', gap:'10px', alignItems: 'center'}}>
             <TablaControl
               cols={["Planta","Proveedor", "Fact", "Fecha", "Scope" , "Planta - Compra", "Proveedor - Compra", "Fact - Compra", "Scope - Compra",  "Match", ""]}
-              mode={false}
             > 
               {match.data.map((value, index) => {
               const mapdata = match.data.filter(e => {

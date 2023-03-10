@@ -26,6 +26,6 @@ export const usePlantas = ({accederLogin}) => {
  
 
   return {
-    plantas
+    plantas, setPlantas
   }
 }

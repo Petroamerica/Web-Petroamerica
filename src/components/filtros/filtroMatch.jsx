@@ -1,9 +1,5 @@
 import React from "react"
-import { Button, Col, Form, Row, Table } from "react-bootstrap"
-import { usePlantas } from '../../hooks/usePlantas'
-import { useProveedores } from '../../hooks/useProveedores'
-import iconSearch from '../../img/iconSearch.png'
-import moment from "moment"
+import { Col, Form, Row } from "react-bootstrap"
 import { config } from '../../config/config'
 import { apis } from '../../api/apis'
 import swal from 'sweetalert'
@@ -82,7 +78,7 @@ const FiltrosMatch = ({plantas, setFiltros, setCompras, setVentas, filtros, acce
             }
           </Form.Select>
         </Col>
-        <Col sm='4'>
+        <Col sm='6'>
           <Form.Text className="text-muted">Proveedor</Form.Text>
           <Form.Select 
           value={filtros.filtros.proveedor} 
@@ -104,14 +100,14 @@ const FiltrosMatch = ({plantas, setFiltros, setCompras, setVentas, filtros, acce
             }
           </Form.Select>
         </Col>
-        <Col className='mt-4' sm='2'>
+        {/* <Col className='mt-4' sm='2'>
           <Button variant="primary"  type="submit" style={{
             display: 'flex',
             padding:'0.3rem',
             gap: '5px',
             alignItems:'center'
             }} ><img src={iconSearch} width="14" alt="icon"/> Buscar</Button>
-        </Col>
+        </Col> */}
       </Form.Group>
     </Form>
     </>

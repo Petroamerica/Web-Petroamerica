@@ -19,6 +19,17 @@ export const  apis = {
     },
 
     /*MATCH SERVICEs*/
+    postAutoMatch: (token, fechaInicial, fechaFinal) => {
+      return fetch(`${url}/Docs_sale_purchase/Automatic/${fechaInicial}/${fechaFinal}`, {
+        method: 'POST', 
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify('')
+      })
+    },
+
     postMatch: (token, data) => {
       return fetch(`${url}/Docs_sale_purchase`, {
         method: 'POST', 
@@ -67,8 +78,7 @@ export const  apis = {
           const res = await solicitud.json()
           return res
       }catch(err){
-        console.log(err)
-          return {error: 'Ocurrió un error en la solicitud para la lista de Compras.'}
+        return {error: 'Ocurrió un error en la solicitud para la lista de Compras.'}
       }
     },
 
@@ -150,7 +160,6 @@ export const  apis = {
     },
     proveedor: async (token, id_cia, fecha1, fecha2, id_tipo, id_planta, id_usuario) =>{
         try{
-      console.log(`${url}/proveedor/${id_cia}/${fecha1}/${fecha2}/${id_tipo}/${id_planta}/${id_usuario}`)
             const solicitud = await fetch(`${url}/proveedor/${id_cia}/${fecha1}/${fecha2}/${id_tipo}/${id_planta}/${id_usuario}`, optionGet(token))
             const res = await solicitud.json()
             return res

@@ -1,8 +1,7 @@
 import React from 'react'
-import { Button, Col, Form, Row, Table } from "react-bootstrap"
+import { Table } from "react-bootstrap"
 
-const TablaControl = ({cols, children, mode}) => {
-  const [drag, setDrag] = React.useState("")
+const TablaControl = ({cols, children }) => {
 
   return (
     <Table  bordered size="md" responsive style={{ 

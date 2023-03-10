@@ -1,5 +1,5 @@
 import moment from "moment"
-import React from "react"
+import React, { useReducer } from "react"
 import { Button, Col, Form, Spinner } from "react-bootstrap"
 import swal from "sweetalert"
 import FiltrosMatch from '../../components/filtros/filtroMatch'
@@ -17,6 +17,8 @@ const Match = ({accederLogin}) => {
   const [selectedCompra,  setSelectedCompra] = React.useState([])
   const [selectedVenta,  setSelectedVenta] = React.useState([])
 
+  // reload sales and purchase trick 
+  const [reloadMatch, setReloadMatch] = useReducer(x => x + 1 ,0)
 
   const [mode, setMode] = React.useState(false)
 
@@ -115,7 +117,11 @@ const Match = ({accederLogin}) => {
         console.log(prev.data.length)
         return prev
       })
-      // reset states
+
+      // delay success
+      setTimeout(() => {
+        swal("Mensaje", "Match logrado exitosamente", "success")
+      }, 250)
     } catch (error) {
       if(error.status === 401 || !config.validarCookies()) {
         swal("Mensaje", "Tiempo de sesión culminado.", "error")
@@ -126,7 +132,26 @@ const Match = ({accederLogin}) => {
       swal("Mensaje", "Ocurrió un error en la solicitud para la lista de Matchs.", "error")
       return
     }
-    swal("Mensaje", "Match logrado exitosamente", "success")
+  }
+
+  const handleAutoMatch = () => {
+    try {
+      const { token } = config.obtenerLocalStorage()
+      apis.postAutoMatch(token, '2023-02-07', '2023-02-07')
+      setSelectedCompra([])
+      setSelectedVenta([])
+      setReloadMatch()
+      swal("Mensaje", "Match Automatico realizado con exito!", "success")
+    } catch (error) {
+      if(error.status === 401 || !config.validarCookies()) {
+        swal("Mensaje", "Tiempo de sesión culminado.", "error")
+        config.cerrarSesion()
+        accederLogin(false)
+        return
+      }
+      swal("Mensaje", "Ocurrió un error en la solicitud para la lista de Matchs.", "error")
+      return
+    }
   }
 
   React.useEffect(() => {
@@ -164,7 +189,7 @@ const Match = ({accederLogin}) => {
       },1000)
       return timeout
     })()
-  }, [userL.token, ventas.filtros.fecha, accederLogin])
+  }, [userL.token, ventas.filtros.fecha, accederLogin, reloadMatch])
 
   React.useEffect(() => {
     (async () => {
@@ -201,7 +226,7 @@ const Match = ({accederLogin}) => {
       }, 1000)
       return timeout 
     })()
-  }, [userL.token, compras.filtros.fecha, accederLogin])
+  }, [userL.token, compras.filtros.fecha, accederLogin, reloadMatch])
 
 
   React.useEffect(() => {
@@ -273,11 +298,20 @@ const Match = ({accederLogin}) => {
           }
           onClick={handleMatch}
           >
-            Enlazar
+            Match
+          </Button>
+        </div>
+        <div>
+          <Button
+          type="button" 
+          onClick={handleAutoMatch}
+          >
+            AutoMatch
           </Button>
         </div>
         <div>
           <ModalMatch 
+              reload={setReloadMatch}
               mode={mode}
               accederLogin={accederLogin}
             />
