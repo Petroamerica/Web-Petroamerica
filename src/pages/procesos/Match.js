@@ -311,7 +311,7 @@ const Match = ({accederLogin}) => {
         padding: 20,
         gap: '10px',
         minHeight: '500px',
-        alignItems: 'center',
+        // alignItems: 'center',
         boxShadow: '0px 0px 8px 0px rgba(0,0,0,0.15)',
       }}>
         <div style={{marginRight: '20px'}}>
@@ -428,7 +428,8 @@ const Match = ({accederLogin}) => {
           <Button
           type="button" 
           style={{
-            marginRight: '10px'
+            marginRight: '10px',
+            marginTop: '110px'
           }}
           disabled={selectedCompra.reduce((acc, obj) => acc + obj.cantidad, 0) === 0 ? true 
           : !(selectedCompra.reduce((acc, obj) => acc + obj.cantidad, 0) === selectedVenta.reduce((acc, obj) => acc + obj.cantidad, 0 ))
