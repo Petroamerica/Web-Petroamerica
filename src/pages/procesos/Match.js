@@ -137,7 +137,7 @@ const Match = ({accederLogin}) => {
   const handleAutoMatch = () => {
     try {
       const { token } = config.obtenerLocalStorage()
-      apis.postAutoMatch(token, '2023-02-07', '2023-02-07')
+      apis.postAutoMatch(token, ventas.filtros.fecha, ventas.filtros.fecha)
       setSelectedCompra([])
       setSelectedVenta([])
       setReloadMatch()

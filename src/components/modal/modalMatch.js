@@ -17,7 +17,7 @@ export const ModalMatch = ({accederLogin, reload}) => {
   // reload matchs trick 
   const [reloadMatchs, setReloadMatchs] = useReducer(x => x + 1 ,0)
 
-  const [proveedoresFilter, setProveedoresFilter] = useState([])
+  const [proveeFilter, setProveeFilter] = useState([])
   const [mapChecked, setMapChecked] = useState([])
   const [match, setMatch] = useState({
     filtros: {
@@ -69,6 +69,31 @@ export const ModalMatch = ({accederLogin, reload}) => {
     }
     return fetchData()
   }, [accederLogin, match.filtros.fecha, reloadMatchs]) 
+
+  React.useEffect(() => {
+    const {token} = config.obtenerLocalStorage()
+
+    async function fetchData() {
+      const prov = await apis.proveedor(token, '06',
+      match.filtros.fecha,
+      match.filtros.fecha,
+      '-',
+      plantas.find(e => e.descripcion === match.filtros.planta).id_planta,
+      "admin")
+      if(prov.error){
+        if(!config.validarCookies()){
+          await swal("Mensaje", "Tiempo de sesión culminado.", "error")
+          config.cerrarSesion()
+          accederLogin(false)
+        }
+        await swal("Mensaje", prov.error , "error")
+        return
+      }
+      prov.unshift({id_proovedor: '-', descripcion: 'TODAS'})
+      setProveeFilter(prov)
+    }
+    fetchData()
+  }, [accederLogin, match.filtros.fecha, match.filtros.planta, plantas])
 
   const handleDeleteData = () => {
     const { token } = config.obtenerLocalStorage()
@@ -169,6 +194,28 @@ export const ModalMatch = ({accederLogin, reload}) => {
                 {
                   plantas.map((value, index) =>
                     <option key={index} value={value.description}>{value.descripcion}</option>
+                  )
+                }
+              </Form.Select>
+            </Col>
+            <Col sm='4'>
+              <Form.Text className="text-muted">Proveedor</Form.Text>
+              <Form.Select 
+              value={match.filtros.proveedor} 
+              name='proveedor' 
+              onChange={(e) => {
+                setMatch(prev => ({
+                  ...prev,
+                  filtros: {
+                    ...prev.filtros,
+                  proveedor: e.target.value}
+                })
+                )}}
+              style={{fontSize:'0.9rem'}}>
+              <option value=''>Seleccionar...</option>
+                {
+                  proveeFilter.map((value, index) =>
+                    <option key={index} value={value.descripcion}>{value.descripcion}</option>
                   )
                 }
               </Form.Select>
