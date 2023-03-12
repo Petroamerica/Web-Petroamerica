@@ -3,7 +3,8 @@ import {config} from '../config/config'
 
 const {optionGet, optionPost, optionPut} = optionFetch()
 
-var url = config.obtenerUrlWeb()
+// var url = config.obtenerUrlWeb()
+var url = "http://190.116.6.12:8084/api"
 
 export const  apis = {
     login : async (data)=> {

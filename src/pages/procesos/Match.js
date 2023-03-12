@@ -293,17 +293,6 @@ const Match = ({accederLogin}) => {
         <div>
           <Button
           type="button" 
-          disabled={selectedCompra.reduce((acc, obj) => acc + obj.cantidad, 0) === 0 ? true 
-          : !(selectedCompra.reduce((acc, obj) => acc + obj.cantidad, 0) === selectedVenta.reduce((acc, obj) => acc + obj.cantidad, 0 ))
-          }
-          onClick={handleMatch}
-          >
-            Match
-          </Button>
-        </div>
-        <div>
-          <Button
-          type="button" 
           onClick={handleAutoMatch}
           >
             AutoMatch
@@ -322,6 +311,7 @@ const Match = ({accederLogin}) => {
         padding: 20,
         gap: '10px',
         minHeight: '500px',
+        alignItems: 'center',
         boxShadow: '0px 0px 8px 0px rgba(0,0,0,0.15)',
       }}>
         <div style={{marginRight: '20px'}}>
@@ -433,6 +423,20 @@ const Match = ({accederLogin}) => {
               </div>
              }
           </div>
+        </div>
+        <div>
+          <Button
+          type="button" 
+          style={{
+            marginRight: '10px'
+          }}
+          disabled={selectedCompra.reduce((acc, obj) => acc + obj.cantidad, 0) === 0 ? true 
+          : !(selectedCompra.reduce((acc, obj) => acc + obj.cantidad, 0) === selectedVenta.reduce((acc, obj) => acc + obj.cantidad, 0 ))
+          }
+          onClick={handleMatch}
+          >
+            Match
+          </Button>
         </div>
         <div>
           <h6>COMPRAS</h6>
