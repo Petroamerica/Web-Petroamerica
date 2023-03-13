@@ -349,15 +349,15 @@ const Match = ({accederLogin}) => {
             >
             {!ventas.estado.loading && 
                 ventas.data.filter(e => {
-                  return (ventas.filtros.planta === 'TODAS') ? true : e.planta === ventas.filtros.planta
+                  return (ventas.filtros.planta === 'TODAS' || ventas.filtros.planta === 'Seleccionar...' ) ? true : e.planta === ventas.filtros.planta
                 }).filter(e => {
-                  return (ventas.filtros.proveedor === 'TODAS') ? true : e.proveedor === ventas.filtros.proveedor
+                  return (ventas.filtros.proveedor === 'TODAS' || ventas.filtros.proveedor === "") ? true : e.proveedor === ventas.filtros.proveedor
                 }).map((value, index) => {
 
                 const mapdata = ventas.data.filter(e => {
-                    return (ventas.filtros.planta === 'TODAS') ? true : e.planta === ventas.filtros.planta
+                    return (ventas.filtros.planta === 'TODAS' || ventas.filtros.planta === "Seleccionar...") ? true : e.planta === ventas.filtros.planta
                   }).filter(e => {
-                    return (ventas.filtros.proveedor === 'TODAS') ? true : e.proveedor === ventas.filtros.proveedor
+                    return (ventas.filtros.proveedor === 'TODAS' || ventas.filtros.proveedor === "") ? true : e.proveedor === ventas.filtros.proveedor
                   }) 
                 let isEqual = false
                 if(index >= 1) {
@@ -475,14 +475,14 @@ const Match = ({accederLogin}) => {
             >
             {!compras.estado.loading && (
                 compras.data.filter(e => {
-                  return (ventas.filtros.planta === 'TODAS') ? true : e.planta === ventas.filtros.planta
+                  return (ventas.filtros.planta === 'TODAS' || ventas.filtros.planta === "Seleccionar..." ) ? true : e.planta === ventas.filtros.planta
                 }).filter(e => {
-                  return (compras.filtros.proveedor === 'TODAS') ? true : e.proveedor === compras.filtros.proveedor
+                  return compras.filtros.proveedor === "TODAS" || compras.filtros.proveedor === ""  ? true : e.proveedor === compras.filtros.proveedor
                 }).map((value, index) => {
                   const mapdata = compras.data.filter(e => {
-                      return (ventas.filtros.planta === 'TODAS') ? true : e.planta === ventas.filtros.planta
+                      return (ventas.filtros.planta === 'TODAS' || ventas.filtros.planta === "Seleccionar...") ? true : e.planta === ventas.filtros.planta
                     }).filter(e => {
-                      return (compras.filtros.proveedor === 'TODAS') ? true : e.proveedor === compras.filtros.proveedor
+                      return (compras.filtros.proveedor === 'TODAS'|| compras.filtros.proveedor === "") ? true : e.proveedor === compras.filtros.proveedor
                     })
                   let isEqual = false
                   if(index >= 1) {

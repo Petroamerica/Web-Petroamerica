@@ -10,13 +10,15 @@ const FiltrosMatch = ({plantas, setFiltros, setCompras, setVentas, filtros, acce
 
   React.useEffect(() => {
     (async () => {
+      const plantasPet = plantas.find(e => {
+          return e.descripcion === filtros.filtros.planta
+        })
+      if(!plantasPet) return
       const prov = await apis.proveedor(token, '06',
         filtros.filtros.fecha,
         filtros.filtros.fecha,
         '-', 
-        plantas.find(e => {
-          return e.descripcion === filtros.filtros.planta
-        }).id_planta,
+        plantasPet.id_planta,
         'admin')
       if(prov.error){
         if(!config.validarCookies()){
@@ -96,14 +98,6 @@ const FiltrosMatch = ({plantas, setFiltros, setCompras, setVentas, filtros, acce
             }
           </Form.Select>
         </Col>
-        {/* <Col className='mt-4' sm='2'>
-          <Button variant="primary"  type="submit" style={{
-            display: 'flex',
-            padding:'0.3rem',
-            gap: '5px',
-            alignItems:'center'
-            }} ><img src={iconSearch} width="14" alt="icon"/> Buscar</Button>
-        </Col> */}
       </Form.Group>
     </Form>
     </>

@@ -53,7 +53,7 @@ export default class header extends Component {
                                 {/*  Carga de Descuentos */}
                                 <NavLink to="/cargaDsctoseepp" className="dropdown-item" style={{color:'#212529', textDecoration:'none'}}>Carga Descuentos EEPP</NavLink>
 
-                                <NavLink to="/match" className="dropdown-item" style={{color:'#212529', textDecoration:'none'}}>Match</NavLink>
+                                <NavLink to="/Match" className="dropdown-item" style={{color:'#212529', textDecoration:'none'}}>Match</NavLink>
                                 {/*  Lista de Precios */}
                                 {/* <NavLink to="/listaPrecios" className="dropdown-item" style={{color:'#212529', textDecoration:'none'}}>Lista de Precios</NavLink> */}
                         </NavDropdown>

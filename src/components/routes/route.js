@@ -53,7 +53,7 @@ export default class route extends Component {
 
                             <Route path="/cargaDsctoseepp" element={ <CargaDsctoEepp accederLogin={this.accederLogin}/>}/>
 
-                            <Route path="/match" element={ <Match accederLogin={this.accederLogin}/>}/>
+                            <Route path="/Match" element={ <Match accederLogin={this.accederLogin}/>}/>
 
                             <Route path="/listaPrecios" element={ <ListaPrecios accederLogin={this.accederLogin}/>}/>
                             

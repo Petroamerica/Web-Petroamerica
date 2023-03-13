@@ -74,11 +74,13 @@ export const ModalMatch = ({accederLogin, reload}) => {
     const {token} = config.obtenerLocalStorage()
 
     async function fetchData() {
+      const plantaPet = plantas.find(e => e.descripcion === match.filtros.planta) 
+      if (!plantaPet) return
       const prov = await apis.proveedor(token, '06',
       match.filtros.fecha,
       match.filtros.fecha,
       '-',
-      plantas.find(e => e.descripcion === match.filtros.planta).id_planta,
+      plantaPet.id_planta || '00',
       "admin")
       if(prov.error){
         if(!config.validarCookies()){
